@@ -352,6 +352,58 @@
   color: var(--text-h);
 }
 
+.notifications-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.notifications-heading button,
+.notification-item button {
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 5px 10px;
+  color: var(--text-h);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.notification-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.notification-item {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.notification-item p {
+  margin: 0;
+  color: var(--text-h);
+}
+
+.notification-item time {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.notification-item button {
+  justify-self: start;
+}
+
+.notification-unread {
+  border-left: 4px solid #176b57;
+  background: color-mix(in srgb, #176b57 7%, transparent);
+}
+
 @media (max-width: 560px) {
   .ride-form {
     grid-template-columns: 1fr;

@@ -7,6 +7,8 @@ function RideDetails() {
   const [ride, setRide] = useState(null);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [requestStatus, setRequestStatus] = useState(null);
+  const [isRequesting, setIsRequesting] = useState(false);
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
@@ -15,10 +17,11 @@ function RideDetails() {
 
     async function loadRide() {
       try {
+        const headers = {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        };
         const response = await fetch(`http://localhost:5001/api/rides/${rideId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          headers,
         });
         const data = await response.json();
 
@@ -32,6 +35,15 @@ function RideDetails() {
         }
 
         setRide(data.ride);
+
+        const requestResponse = await fetch(
+          `http://localhost:5001/api/rides/${rideId}/request`,
+          { headers }
+        );
+        const requestData = await requestResponse.json();
+        if (isCurrent && requestResponse.ok) {
+          setRequestStatus(requestData.request?.status || null);
+        }
       } catch (error) {
         console.error(error);
         if (isCurrent) {
@@ -52,6 +64,37 @@ function RideDetails() {
       isCurrent = false;
     };
   }, [rideId, user?.role]);
+
+  const handleRequestSeat = async () => {
+    setMessage("");
+    setIsRequesting(true);
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/rides/${rideId}/request`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Unable to request a seat.");
+        if (data.request?.status) {
+          setRequestStatus(data.request.status);
+        }
+        return;
+      }
+
+      setRequestStatus(data.request.status);
+      setMessage(data.message);
+    } catch (error) {
+      console.error(error);
+      setMessage("Unable to connect to the server.");
+    } finally {
+      setIsRequesting(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -107,6 +150,15 @@ function RideDetails() {
               <dd>{Number(ride.pricePerSeat).toFixed(2)}</dd>
             </div>
           </dl>
+          <div className="ride-request-actions">
+            {requestStatus ? (
+              <p role="status">Seat request status: {requestStatus}</p>
+            ) : (
+              <button type="button" onClick={handleRequestSeat} disabled={isRequesting}>
+                {isRequesting ? "Requesting..." : "Request a seat"}
+              </button>
+            )}
+          </div>
         </section>
       )}
     </main>
