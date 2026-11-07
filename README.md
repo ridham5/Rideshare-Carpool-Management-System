@@ -1,5 +1,7 @@
 # Rideshare / Carpool Management System
 
+![CI](https://github.com/ridham5/Rideshare-Carpool-Management-System/actions/workflows/ci.yml/badge.svg)
+
 A full-stack web app where drivers post rides and riders search, request and book seats.
 Built by a 3-person Agile team over four two-week Scrum sprints for CPS714 (Software Project
 Management) at Toronto Metropolitan University, Fall 2026.
