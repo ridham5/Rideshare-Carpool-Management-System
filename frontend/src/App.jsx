@@ -7,6 +7,7 @@ import SearchRides from "./pages/SearchRides";
 import RideDetails from "./pages/RideDetails";
 import ManageRequests from "./pages/ManageRequests";
 import UpcomingTrips from "./pages/UpcomingTrips";
+import RideHistory from "./pages/RideHistory";
 import Notifications from "./pages/Notifications";
 import "./App.css";
 
@@ -28,6 +29,8 @@ function App() {
         {" | "}
         <Link to="/rides/upcoming">Upcoming Trips</Link>
         {" | "}
+        <Link to="/rides/history">Ride History</Link>
+        {" | "}
         <Link to="/notifications">Notifications</Link>
       </nav>
 
@@ -41,6 +44,7 @@ function App() {
         <Route path="/rides/:rideId" element={<RideDetails />} />
         <Route path="/rides/requests" element={<ManageRequests />} />
         <Route path="/rides/upcoming" element={<UpcomingTrips />} />
+        <Route path="/rides/history" element={<RideHistory />} />
         <Route path="/notifications" element={<Notifications />} />
       </Routes>
     </BrowserRouter>

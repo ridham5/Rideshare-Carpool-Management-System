@@ -208,6 +208,56 @@ router.get("/upcoming", requireAuth, async (req, res) => {
   }
 });
 
+router.get("/history", requireAuth, async (req, res) => {
+  try {
+    const now = new Date();
+
+    if (req.user.role === "Driver") {
+      const rides = await Ride.find({
+        driver: req.user._id,
+        departureTime: { $lte: now },
+      })
+        .populate("driver", "name")
+        .sort({ departureTime: -1 });
+
+      return res.status(200).json({
+        trips: rides.map((ride) => ({
+          ride,
+          role: "Driver",
+          status: "Completed",
+        })),
+      });
+    }
+
+    const requests = await RideRequest.find({
+      rider: req.user._id,
+      status: "Approved",
+    })
+      .populate({
+        path: "ride",
+        match: { departureTime: { $lte: now } },
+        populate: { path: "driver", select: "name" },
+      })
+      .sort({ createdAt: -1 });
+    const trips = requests
+      .filter((request) => request.ride)
+      .map((request) => ({
+        ride: request.ride,
+        role: "Rider",
+        status: "Completed",
+      }))
+      .sort(
+        (first, second) =>
+          new Date(second.ride.departureTime) - new Date(first.ride.departureTime)
+      );
+
+    return res.status(200).json({ trips });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error." });
+  }
+});
+
 router.delete("/:rideId/booking", requireAuth, requireRider, async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.rideId)) {
     return res.status(400).json({ message: "Invalid ride ID." });

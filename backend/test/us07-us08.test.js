@@ -54,6 +54,17 @@ function queryReturning(value) {
   };
 }
 
+function queryWithPopulation(value) {
+  return {
+    populate() {
+      return this;
+    },
+    sort() {
+      return Promise.resolve(value);
+    },
+  };
+}
+
 beforeEach(() => {
   Ride.findOne = async () => futureRide();
   Ride.findOneAndUpdate = async () => futureRide({ availableSeats: 1 });
@@ -204,5 +215,55 @@ describe("US08 - driver manages pending requests", () => {
 
     assert.equal(res.statusCode, 404);
     assert.match(res.body.message, /no longer available/i);
+  });
+});
+
+describe("US09 - user views ride history", () => {
+  it("returns past rides driven by the authenticated driver", async () => {
+    let rideQuery;
+    const ride = futureRide({
+      departureTime: new Date(Date.now() - 60 * 60 * 1000),
+    });
+    Ride.find = (query) => {
+      rideQuery = query;
+      return queryWithPopulation([ride]);
+    };
+    const res = response();
+
+    await routeHandler("get", "/history")(
+      { user: { _id: driverId, role: "Driver" } },
+      res
+    );
+
+    assert.equal(res.statusCode, 200);
+    assert.equal(rideQuery.driver, driverId);
+    assert.ok(rideQuery.departureTime.$lte instanceof Date);
+    assert.deepEqual(res.body.trips, [
+      { ride, role: "Driver", status: "Completed" },
+    ]);
+  });
+
+  it("returns only past approved bookings for the authenticated rider", async () => {
+    let requestQuery;
+    const ride = futureRide({
+      departureTime: new Date(Date.now() - 60 * 60 * 1000),
+      driver: { name: "Driver" },
+    });
+    RideRequest.find = (query) => {
+      requestQuery = query;
+      return queryWithPopulation([{ ride, status: "Approved" }]);
+    };
+    const res = response();
+
+    await routeHandler("get", "/history")(
+      { user: { _id: riderId, role: "Rider" } },
+      res
+    );
+
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(requestQuery, { rider: riderId, status: "Approved" });
+    assert.deepEqual(res.body.trips, [
+      { ride, role: "Rider", status: "Completed" },
+    ]);
   });
 });
