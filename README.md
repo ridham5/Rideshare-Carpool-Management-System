@@ -25,7 +25,7 @@ middleware, seat-count logic, MongoDB setup, integration testing).
 
 React (Vite) · Node.js · Express · MongoDB Atlas (Mongoose) · JWT · bcrypt · Node.js test runner
 
-## API (16 endpoints)
+## API (17 endpoints)
 
 | Method | Route | Who |
 | --- | --- | --- |
@@ -36,6 +36,7 @@ React (Vite) · Node.js · Express · MongoDB Atlas (Mongoose) · JWT · bcrypt 
 | GET | `/api/rides` | Rider (search) |
 | GET | `/api/rides/:rideId` | Rider |
 | GET | `/api/rides/upcoming` | Signed in |
+| GET | `/api/rides/history` | Signed in (past rides) |
 | DELETE | `/api/rides/:rideId` | Driver (cancel ride) |
 | POST | `/api/rides/:rideId/request` | Rider |
 | GET | `/api/rides/:rideId/request` | Rider |
