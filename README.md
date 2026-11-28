@@ -71,7 +71,7 @@ npm run dev
 ## How we worked
 
 - Four two-week Scrum sprints with sprint planning, check-ins, burndown and Gantt tracking
-- Sprints 1–3: **11 user stories (44 tasks) delivered on schedule**
+- Sprints 1–4: **12 user stories (50 tasks) delivered on schedule**; Sprint 4 added ride history (US12)
 - Feature branches and pull requests on GitHub
 
 ## Team
